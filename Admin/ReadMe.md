@@ -6,6 +6,5 @@ Details about the files:
   
 File | Description
 ---|---------------------------------------------------------------------
-  
 Dummy Scope of Work.docx | Contains information on direction and scope of project.  
 
