@@ -1,0 +1,92 @@
+---
+title: "Collaborator Report"
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{fancyhdr}
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(here::here("Reports/R_Version/"), 
+                        "Collaborator_R.pdf"))})
+output: 
+  pdf_document: default
+---
+\fancypagestyle{plain}{
+\fancyhead[R, R]{Investigator: Dr. John Doe\\ Analyst: Grace Bosma}
+\fancyhead[L]{Project: Reproducible Report Toy Example\\ `r paste(format(Sys.Date(), '%B %d, %Y'))`}
+\setlength{\headheight}{23pt}
+}
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, include=FALSE}
+library(tidyverse) # for piping and functions like select/filter etc
+library(gtsummary) # for tabling in results
+library(scales) # for p-value formatting
+```
+
+# Updates
+- added some text to ReadMe.md files    
+- added session info   
+
+# Project Summary
+
+We are interested in comparing weight of vehicles with their gas mileage. We hypothesize that vehicles that weigh more than 3,500 lbs will have worse gas mileage than the vehicles that do not.
+
+**Note this (collaborator) report will be very similar to the comprehensive report, differing only by exclusion of code chunks**
+
+```{r import data}
+# we are using mtcars 
+dat_raw <- mtcars
+```
+
+
+# Data Management
+
+Create a new binary variable for vehicle weight.
+
+```{r data management}
+# categorical weight variable
+dat <- dat_raw %>%
+  # name variables appropriately and using similar style (snake_case, camelCase or PascalCase)
+  dplyr::mutate(wt_cat = dplyr::case_when(wt > 3.5 ~ "Heavier than 3500lbs", 
+                                          wt <= 3.5 ~ "3500lbs or lighter")
+  )
+
+```
+
+
+# Analysis
+
+Analysis plan initially included a t-test to compare mileage (mpg) between lighter and heavier cars. Later, the analysis team felt a continuous approach would be more applicable. A linear model including mpg as the outcome and weight (per 1000lbs) as a covariate was utilized. 
+
+```{r original approach}
+model_ttest <- t.test( dat$mpg ~ dat$wt_cat)
+model_ttest 
+```
+
+```{r adjustment}
+# Using snake_case still
+m_linear <- lm(mpg ~ wt, data = dat)
+summary(m_linear)
+```
+
+# Results
+
+The t test comparing mean gas mileage between cars that weigh over 3500lbs and those who do not resulted in a significant difference (test statistic = `r round(model_ttest$statistic,2)`, p `r scales::pvalue(model_ttest$p.value, accuracy = 0.01)`). Linear model provided similar results with every additional thousand pound increase in vehicle weight resulting in `r -1*round(m_linear$coefficients[2],2)` less miles per gallon (p `r scales::pvalue(summary(m_linear)$coefficients[2,4], accuracy = 0.01)`). Both t test and linear model indicate an inverse relationship between vehicle weight and gas mileage.
+
+
+```{r table output}}
+gtsummary::tbl_regression(m_linear, label = wt ~ "Weight")
+```
+
+
+```{r Session info}
+# Session Info
+writeLines(capture.output(sessionInfo()), "collaborator_session_info.txt")
+```
+
+
+

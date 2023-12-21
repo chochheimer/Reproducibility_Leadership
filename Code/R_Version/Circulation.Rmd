@@ -1,0 +1,69 @@
+---
+title: "Circulation Report"
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{fancyhdr}
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(here::here("Reports/R_Version/"), 
+                        "Circulation_R.pdf"))})
+output: 
+  pdf_document: default
+---
+\fancypagestyle{plain}{
+  \fancyhead[R, R]{Investigator: Dr. John Doe\\ Analyst: Grace Bosma}
+  \fancyhead[L]{Project: Reproducible Report Toy Example\\ `r paste(format(Sys.Date(), '%B %d, %Y'))`}
+  \setlength{\headheight}{23pt}
+}
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, include=FALSE}
+library(tidyverse) # for piping and functions like select/filter etc
+library(gtsummary) # for tabling in results
+library(scales) # for p-value formatting
+```
+
+# Updates
+- added some text to ReadMe.md files    
+- added session info    
+
+# Introduction
+
+We are interested in comparing weight of vehicles with their gas mileage. We hypothesize that vehicles with a higher weight will have worse gas mileage compared to vehicles with a lower weight.
+
+**Note this (circulation) report will only contain what is pertinent to the manuscript**
+
+```{r import data}
+# we are using mtcars 
+dat_raw <- mtcars
+```
+
+
+# Statistical methods
+
+A linear model including mpg as the outcome and weight (per 1000lbs) as a covariate was utilized. 
+
+```{r adjustment}
+# Using snake_case
+m_linear <- lm(mpg ~ wt, data = dat_raw)
+#summary(m_linear)
+```
+
+# Results
+
+Linear model indicated that with every additional thousand pound increase in vehicle weight resulting in `r -1*round(m_linear$coefficients[2],2)` less miles per gallon (p `r scales::pvalue(summary(m_linear)$coefficients[2,4], accuracy = 0.01)`), indicating an inverse relationship between vehicle weight and gas mileage.
+  
+```{r table output}
+gtsummary::tbl_regression(m_linear, label = wt ~ "Weight")
+```
+
+
+```{r Session info}
+writeLines(capture.output(sessionInfo()), "circulation_session_info.txt")
+```
+
+
