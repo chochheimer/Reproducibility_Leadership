@@ -1,7 +1,7 @@
 **Project Name**: Reproducibility Paper Example  
 **PI**: Dr. John Doe  
 **Analyst**:   
-**Shared drive Location**: Shared/ColoradoSPH/ConsultingCenter/ReproducibilityPaper
+**Shared drive Location**: Shared/ColoradoSPH/ConsultingCenter/ReproducibilityPaper  
 **GitHub Location**: https://github.com/chochheimer/Reproducibility_Leadership   
 
 Details about the folders:
